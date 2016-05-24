@@ -10,10 +10,47 @@ class BioMolecule():
     @type name: str
     @type mass: float
     """
+
     def __init__(self, id, name, mass=0.):
         self.id = id
         self.name = name
         self.mass = mass
+
+    @property
+    def id(self):
+        print("getter")
+        return self.__id
+
+    @id.setter
+    def id(self, value):
+        print("setter")
+        if not isinstance(value, int):
+            raise TypeError("id must be integer.")
+        self.__id = value
+
+    @property
+    def name (self):
+        print("getter")
+        return self.__name
+    
+    @name.setter
+    def name(self, value):
+        print("setter")
+        if not isinstance(value, str):
+            raise TypeError("Name must be string.")
+        self.__name = value
+
+    @property
+    def mass(self):
+        print("getter")
+        return self.__mass
+    
+    @mass.setter
+    def mass(self, value):
+        print("setter")
+        if not isinstance(value, float):
+            raise TypeError("Mass must be float.")
+        self.__mass = value
 
     # 1. Write setter and getter methods for all attributes.
     #    Use @property decorators as dicussed in the lecture
@@ -30,12 +67,29 @@ class Polymer(BioMolecule):
     @type mass: float
     """
     def __init__(self, id, name, sequence, mass=0.):
-        # 3. Initialize the parent class correctly
+        super().__init__(id, name, mass)
         self.sequence = sequence
+
+    @property
+    def sequence (self):
+        print("getter")
+        return self.__sequence
+    
+    @sequence.setter
+    def sequence(self, value):
+        print("setter")
+        if not isinstance(value, str):
+            raise TypeError("Sequence must be string.")
+        if len(value)%3!=0:
+            raise ValueError("Wrong sequence length.")
+        self.__sequence = value
+
+        # 3. Initialize the parent class correctly
+        
 
     
     # 4. Write getter and setter for sequence, again check for type
-    # 5. run in ipython, instantiate this class, and test it
+    # 5. run in ipython, instantiate this class,p and test it
     def __getitem__(self, value):
         """
         Makes the sequence accessible via the indexing operators:
@@ -47,21 +101,31 @@ class Polymer(BioMolecule):
         """
          Enables changing of sequence characters via the indexing operators.       
         """
-        tmp = list(sequence)
+        tmp = list(self.sequence)
         tmp[key] = value
         self.sequence = "".join(tmp)
 
 
 class MRNA(Polymer):
     def __init__(self, id, name, sequence, mass=0.):
+        super().__init__(id, name, sequence, mass)
+
         # 6. Initialize the parent class correctly
+
+
 
         # 7. Create a list that stores if a ribosome is bound for each
         # codon (triplet).
-        self.binding = [] # use this attribute for 7.
+        self.binding = [0]*(len(sequence)//3) # use this attribute for 7.
 
     def calculate_mass(self):
         NA_mass = {'A': 1.0, 'U': 2.2, 'G':2.1, 'C':1.3}
+
+        mass_seq=0
+        for x in self.sequence:
+            mass_seq+=NA_mass[x]
+        return mass_seq
+
         # 8. calculate the mass for the whole sequence
 
 class Protein(Polymer):
@@ -81,7 +145,7 @@ class Protein(Polymer):
     def __init__(self, id, name, sequence, mass=0.):
         super().__init__(id, name, sequence, mass)
         self.__class__.number_of_proteins += 1 #  increase instance counter
-        self.mass = self.calculate_mass()
+        self.calculate_mass()
 
     # 9. implement the elongation feature described in the docstring. (__add__)
 
